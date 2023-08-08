@@ -42,3 +42,30 @@ def main():
             audio = recognizer.listen(source)
             try:
                 transcription = recognizer.recognize_google(audio)
+                if transcription.lower() == "genius":
+                    # Record Audio
+                    filename = "input.wav"
+                    print("Say your question..")
+                    with sr.Microphone() as source:
+                        recognizer = sr.Recognizer()
+                        source.pause_threshold = 1
+                        audio = recognizer.listen(source, phrase_time_limit=None, timeout=None)
+                        with open(filename, "wb") as f:
+                            f.write(audio.get_wav_data())
+
+                    # Transcribe audio to text
+                    text = transcribe_audio_to_text(filename)
+                    if text:
+                        print(f"You said: {text}")
+
+                        # Generate response using GPT-3
+                        response = generate_response(text)
+                        print(f"GPT-3 says: {response}")
+
+                        # Read response using text-to-speech
+                        speak_text(response)
+            except Exception as e:
+                print("An error occured: {}".format(e))
+
+if __name__ == "__main__":
+    main()
